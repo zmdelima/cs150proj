@@ -1,0 +1,232 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<!-- Import Polymer -->
+<link rel="import" href="../bower_components/polymer/polymer.html">
+
+<!-- Polymer Element Dependencies-->
+<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+
+<!-- Other Dependencies -->
+
+<link rel="import" href="shared-styles.html">
+
+<dom-module id="diet-optimizer">
+  <template>
+    <style include="shared-styles">
+      :host {
+        display: block;
+
+        padding: 10px;
+      }
+      .fl {
+        background-color: var(--paper-indigo-500);
+        color: white;
+      }
+      .pfl {
+        background-color: var(--paper-red-400);
+        color: white;
+      }
+      table {
+        color: #333;
+        font-family: Helvetica, Arial, sans-serif;
+        width: 100%;
+        border-collapse:
+        collapse; border-spacing: 0;
+      }
+      
+      td, th {
+        border: 1px solid transparent; /* No more visible border */
+        height: 30px;
+        transition: all 0.3s; /* Simple transition for hover effect */
+      }
+      
+      th {
+        background: #DFDFDF; /* Darken header a bit */
+        font-weight: bold;
+      }
+      
+      td {
+        background: #FAFAFA;
+        text-align: center;
+      }
+      
+      /* Cells in even rows (2,4,6...) are one color */
+      tr:nth-child(even) td { background: #F1F1F1; }
+      
+      /* Cells in odd rows (1,3,5...) are another (excludes header cells) */
+      tr:nth-child(odd) td { background: #FEFEFE; }
+      
+      tr td:hover { background: #666; color: #FFF; } /* Hover cell effect! */
+    </style>
+  
+    
+    <div class="card">
+      <div class="circle">2</div>
+      <h1 id="page_title">Diet Optimizer</h1>
+      <div>
+        <p>
+        <h3>Instructions:</h3>
+        1.Click the add button beside the food to add them to the diet plan.
+        <br/>
+        2.Click the "Solve" button if you want to know resulting quantity if your food combination is feasible</p>
+      </div>
+      
+        <div id="food-display">
+          <table id="food-table-details">
+            <tr>
+              <th>Name</th>
+              <th>Price Per Serving</th>
+              <th>Serving Size</th>
+              <th>Calories</th>
+              <th>Cholesterol (mg)</th>
+              <th>Total_Fat (g)</th>
+              <th>Sodium (mg)</th>
+              <th>Carbohydrates (g)</th>
+              <th>Dietary Fiber (g)</th>
+              <th>Protein (g)</th>
+              <th>Vit_A (IU)</th>
+              <th>Vit_C (IU)</th>
+              <th>Calcium (mg)</th>
+              <th>Iron (mg)</th>
+            </tr>
+            <tr>
+              <td>[[displayFood.name]]</td>
+              <td>$[[displayFood.cost]]</td>
+              <td>[[displayFood.serving]]</td>
+              <td>[[displayFood.calories]]</td>
+              <td>[[displayFood.cholesterol]]</td>
+              <td>[[displayFood.total_fat]]</td>
+              <td>[[displayFood.sodium]]</td>
+              <td>[[displayFood.carbohydrates]]</td>
+              <td>[[displayFood.fiber]]</td>
+              <td>[[displayFood.protein]]</td>
+              <td>[[displayFood.vitA]]</td>
+              <td>[[displayFood.vitC]]</td>
+              <td>[[displayFood.calcium]]</td>
+              <td>[[displayFood.iron]]</td>
+            </tr>
+          </table>
+        </div>
+          <div id="buttons">
+            <h4 id="fc-title">Food Choices</h4>
+            <div id="food-container" class="card list-group">
+                  <template is="dom-repeat" items="{{data}}">
+                      <paper-button raised class ="fl" on-click="displayThis" value="[[item]]">
+                        {{item.name}}
+                        <paper-icon-button icon="add" on-click="itemHandler" value="[[item]]"></paper-icon-button>
+                      </paper-button>
+                  </template>
+            </div>
+          </div>
+        <paper-button on-click="pdata1">DATA1</paper-button>
+        <paper-button on-click="pdata2">DATA2</paper-button>
+        <paper-button on-click="clearChoices">CLEAR</paper-button>
+    </div>
+  </template>
+  
+
+  <script>
+    Polymer({
+      is: 'diet-optimizer',
+      properties: {
+        displayFood: {
+          value: {}
+        },
+        data: {
+          type: Array,
+          value: []
+        },
+        data2: {
+          type: Array,
+          value: []
+        }
+      },
+      pdata1: function(){
+        console.log(this.data)
+        
+      },
+      pdata2: function(){
+        console.log(this.data2)
+      },
+      itemHandler: function(event){
+        if(event.target.getAttribute('icon') == 'add')this.addItem(event)
+        this.removeItem(event)
+      },
+      addItem: function(event){
+        console.log("Add an item")
+        event.cancelBubble = true;
+        event.stopPropagation();
+        //push data
+        if(this.data2.push(event.target.value)) console.log(`Added item `+event.target.value.name)
+        //sync UI
+        event.target.setAttribute('icon','remove')
+        event.target.setAttribute('on-click','removeItem')
+        event.target.parentNode.setAttribute('class','pfl')
+      },
+      removeItem: function(event){
+        console.log("huehueuhe")
+        event.cancelBubble = true;
+        event.stopPropagation();
+        //pop data
+        
+        //sync UI
+        event.target.setAttribute('icon','add')
+        event.target.setAttribute('on-click','addItem')
+        event.target.parentNode.setAttribute('class','fl')
+      },
+      clearChoices: function(){
+        
+      },
+      displayThis: function(e){
+        console.log("Display function")
+        console.log(e.target.value)
+        //if(e.target.getAttribute('name') == 'clrbtn') this.removeItem(e.target.value)
+        this.set("displayFood",e.target.value)
+      },
+      ready: function(){
+        this.data = [
+        {
+          name:"banana",
+          cost:15,
+          calories:10,
+          cholesterol:4,
+          total_fat: 10,
+          sodium: 0,
+          carbohydrates: 200,
+          fiber: 15,
+          protein: 2,
+          vitA: 20,
+          vitC: 0,
+          calcium: 0,
+          iron: 50
+        },
+        {
+          name: "machika",
+          cost:23,
+          calories:17,
+          cholesterol:23,
+          total_fat: 6,
+          sodium: 20,
+          carbohydrates: 86,
+          fiber: 25,
+          protein: 21,
+          vitA: 21,
+          vitC: 29,
+          calcium: 37,
+          iron: 86
+        }
+        ]
+        var data2 = this.data2
+      }
+    });
+  </script>
+</dom-module>
