@@ -120,9 +120,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <h4 id="fc-title">Food Choices</h4>
             <div id="food-container" class="card list-group">
                   <template is="dom-repeat" items="{{data}}">
-                      <paper-button raised class ="fl" on-click="displayThis" value="[[item]]">
+                      <paper-button raised class ="fl" on-click="displayThis" value="{{item}}">
                         {{item.name}}
-                        <paper-icon-button icon="add" on-click="itemHandler" value="[[item]]"></paper-icon-button>
+                        <paper-icon-button icon="add" on-click="itemHandler" value="{{item}}"></paper-icon-button>
                       </paper-button>
                   </template>
             </div>
@@ -152,17 +152,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       },
       pdata1: function(){
         console.log(this.data)
-        
       },
       pdata2: function(){
         console.log(this.data2)
       },
       itemHandler: function(event){
         if(event.target.getAttribute('icon') == 'add')this.addItem(event)
-        this.removeItem(event)
+        else this.removeItem(event)
       },
       addItem: function(event){
-        console.log("Add an item")
+        console.log("Adding item to selected food")
         event.cancelBubble = true;
         event.stopPropagation();
         //push data
@@ -173,18 +172,27 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         event.target.parentNode.setAttribute('class','pfl')
       },
       removeItem: function(event){
-        console.log("huehueuhe")
+        console.log("Removing item from selected food")
         event.cancelBubble = true;
         event.stopPropagation();
         //pop data
-        
+        var temp = JSON.stringify(event.target.value)
+        var index = 0;
+        for(var i=0;i<this.data2.length;i++){
+          if(temp == JSON.stringify(this.data2[i])) {
+              index = i;
+              break;
+          }
+        }
+        if(index < this.data2.length) this.data2.splice(index,1);
         //sync UI
         event.target.setAttribute('icon','add')
         event.target.setAttribute('on-click','addItem')
         event.target.parentNode.setAttribute('class','fl')
       },
       clearChoices: function(){
-        
+        var cols = this.root.querySelectorAll('.pfl')
+        console.log(cols)
       },
       displayThis: function(e){
         console.log("Display function")
