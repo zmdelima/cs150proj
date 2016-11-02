@@ -156,27 +156,23 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       pdata2: function(){
         console.log(this.data2)
       },
-      itemHandler: function(event){
-        if(event.target.getAttribute('icon') == 'add')this.addItem(event)
-        else this.removeItem(event)
+      itemHandler: function(e){
+        if(e.target.getAttribute('icon') == 'add')this.addItem(e)
+        else this.removeItem(e)
       },
-      addItem: function(event){
+      addItem: function(e){
         console.log("Adding item to selected food")
-        event.cancelBubble = true;
-        event.stopPropagation();
         //push data
-        if(this.data2.push(event.target.value)) console.log(`Added item `+event.target.value.name)
+        if(this.data2.push(e.target.value)) console.log(`Added item `+e.target.value.name)
         //sync UI
-        event.target.setAttribute('icon','remove')
-        event.target.setAttribute('on-click','removeItem')
-        event.target.parentNode.setAttribute('class','pfl')
+        e.target.setAttribute('icon','remove')
+        e.target.setAttribute('on-click','removeItem')
+        e.target.parentNode.setAttribute('class','pfl')
       },
-      removeItem: function(event){
+      removeItem: function(e){
         console.log("Removing item from selected food")
-        event.cancelBubble = true;
-        event.stopPropagation();
         //pop data
-        var temp = JSON.stringify(event.target.value)
+        var temp = JSON.stringify(e.target.value)
         var index = 0;
         for(var i=0;i<this.data2.length;i++){
           if(temp == JSON.stringify(this.data2[i])) {
@@ -186,18 +182,20 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
         if(index < this.data2.length) this.data2.splice(index,1);
         //sync UI
-        event.target.setAttribute('icon','add')
-        event.target.setAttribute('on-click','addItem')
-        event.target.parentNode.setAttribute('class','fl')
+        e.target.setAttribute('icon','add')
+        e.target.setAttribute('on-click','addItem')
+        e.target.parentNode.setAttribute('class','fl')
       },
       clearChoices: function(){
-        var cols = this.root.querySelectorAll('.pfl')
-        console.log(cols)
+        //push every remove button that is under the picked food list class
+        var pickedfoods = this.root.querySelectorAll('.pfl > paper-icon-button')
+        pickedfoods.forEach(function(pickedfood){
+          pickedfood.click();
+        });
       },
       displayThis: function(e){
         console.log("Display function")
         console.log(e.target.value)
-        //if(e.target.getAttribute('name') == 'clrbtn') this.removeItem(e.target.value)
         this.set("displayFood",e.target.value)
       },
       ready: function(){
