@@ -2,8 +2,8 @@
 @license
 Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
 This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
-The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
-The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+The compvare set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The compvare set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
 Code distributed by Google as part of the polymer project is also
 subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
 -->
@@ -12,11 +12,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/polymer/polymer.html">
 
 <!-- Polymer Element Dependencies-->
-<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+<!--<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">-->
+<link rel="import" href="my-icons.html">
 <link rel="import" href="../bower_components/paper-button/paper-button.html">
 
 <!-- Other Dependencies -->
-
 <link rel="import" href="shared-styles.html">
 
 <dom-module id="diet-optimizer">
@@ -30,11 +30,28 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       .fl {
         background-color: var(--paper-indigo-500);
         color: white;
+        margin-top: 5px;
+        margin-bottom: 5px;
       }
       .pfl {
         background-color: var(--paper-red-400);
         color: white;
+        margin-top: 5px;
+        margin-bottom: 5px;
       }
+      .card .fc {
+        background-color: var(--paper-grey-400);
+      }
+      
+      .pg {
+        background-color: var(--paper-grey-700);
+        color: black;
+      }
+      .pgn{
+        background-color: var(--paper-blue-400);
+        color: white;
+      }
+      
       table {
         color: #333;
         font-family: Helvetica, Arial, sans-serif;
@@ -70,14 +87,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   
     
     <div class="card">
-      <div class="circle">2</div>
       <h1 id="page_title">Diet Optimizer</h1>
       <div>
         <p>
         <h3>Instructions:</h3>
         1.Click the add button beside the food to add them to the diet plan.
         <br/>
-        2.Click the "Solve" button if you want to know resulting quantity if your food combination is feasible</p>
+        2.Click the food to display its details on the table above.
+        <br/>
+        3.Click the "Solve" button if you want to know resulting quantity if your food combination is feasible</p>
       </div>
       
         <div id="food-display">
@@ -104,7 +122,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               <td>[[displayFood.serving]]</td>
               <td>[[displayFood.calories]]</td>
               <td>[[displayFood.cholesterol]]</td>
-              <td>[[displayFood.total_fat]]</td>
+              <td>[[displayFood.totalFat]]</td>
               <td>[[displayFood.sodium]]</td>
               <td>[[displayFood.carbohydrates]]</td>
               <td>[[displayFood.fiber]]</td>
@@ -116,71 +134,99 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             </tr>
           </table>
         </div>
+        
           <div id="buttons">
             <h4 id="fc-title">Food Choices</h4>
-            <div id="food-container" class="card list-group">
-                  <template is="dom-repeat" items="{{data}}">
+            <div id="pages" class="horizontal layout">
+              <paper-button id="pg1" class="flex pgn" on-click="changePage" value=1>1</paper-button>
+              <paper-button id="pg2" class="flex pg" on-click="changePage" value=2>2</paper-button>
+              <paper-button id="pg3" class="flex pg" on-click="changePage" value=3>3</paper-button>
+              <paper-button id="pg4" class="flex pg" on-click="changePage" value=4>4</paper-button>
+            </div>
+            <div id="food-container" class="card fc">
+                <div id="page1">
+                  <template id="food-page1" is="dom-repeat" items="{{foodpg1}}">
                       <paper-button raised class ="fl" on-click="displayThis" value="{{item}}">
                         {{item.name}}
                         <paper-icon-button icon="add" on-click="itemHandler" value="{{item}}"></paper-icon-button>
                       </paper-button>
                   </template>
+                </div>
+                <div id="page2">
+                  <template id="food-page2" is="dom-repeat" items="{{foodpg2}}">
+                      <paper-button raised class ="fl" on-click="displayThis" value="{{item}}">
+                        {{item.name}}<paper-icon-button icon="add" on-click="itemHandler" value="{{item}}"></paper-icon-button>
+                      </paper-button>
+                  </template>
+                </div>
+                <div id="page3">
+                  <template id="food-page3" is="dom-repeat" items="{{foodpg3}}">
+                      <paper-button raised class ="fl" on-click="displayThis" value="{{item}}">
+                        {{item.name}}<paper-icon-button icon="add" on-click="itemHandler" value="{{item}}"></paper-icon-button>
+                      </paper-button>
+                  </template>
+                </div>
+                <div id="page4">
+                  <template id="food-page4" is="dom-repeat" items="{{foodpg4}}">
+                      <paper-button raised class ="fl" on-click="displayThis" value="{{item}}">
+                        {{item.name}}<paper-icon-button icon="add" on-click="itemHandler" value="{{item}}"></paper-icon-button>
+                      </paper-button>
+                  </template>
+                </div>
             </div>
           </div>
-        <paper-button on-click="pdata1">DATA1</paper-button>
         <paper-button on-click="pdata2">DATA2</paper-button>
+        <paper-button on-click="chooseAllChoices">CHOOSE ALL</paper-button>
         <paper-button on-click="clearChoices">CLEAR</paper-button>
+        <paper-button on-click="solve">SOLVE</paper-button>
+        <div class="card answer">
+          <h2>RESULTS:</h2>
+          <div id="infeasible">
+          </div>
+          <div id="feasibleResults">
+            <table id="feasible">
+            </table>  
+          </div>
+          
+        </div>
     </div>
-  </template>
   
-
+  </template>
+  <script src="//code.jquery.com/jquery-1.10.2.min.js"></script>
+  <script src="../bower_components/opencpu.js/opencpu-0.5.js"></script>
   <script>
     Polymer({
       is: 'diet-optimizer',
-      properties: {
-        displayFood: {
-          value: {}
-        },
-        data: {
-          type: Array,
-          value: []
-        },
-        data2: {
-          type: Array,
-          value: []
-        }
-      },
-      pdata1: function(){
-        console.log(this.data)
-      },
       pdata2: function(){
-        console.log(this.data2)
+        console.log(this.selectedFood)
       },
       itemHandler: function(e){
         if(e.target.getAttribute('icon') == 'add')this.addItem(e)
         else this.removeItem(e)
       },
       addItem: function(e){
-        console.log("Adding item to selected food")
+        //stop click propagation to parent element
+        e.stopPropagation()
         //push data
-        if(this.data2.push(e.target.value)) console.log(`Added item `+e.target.value.name)
+        this.selectedFood.push(e.target.value)
         //sync UI
         e.target.setAttribute('icon','remove')
         e.target.setAttribute('on-click','removeItem')
         e.target.parentNode.setAttribute('class','pfl')
       },
       removeItem: function(e){
-        console.log("Removing item from selected food")
+        //stop click propagation to parent element
+        e.stopPropagation()
         //pop data
         var temp = JSON.stringify(e.target.value)
         var index = 0;
-        for(var i=0;i<this.data2.length;i++){
-          if(temp == JSON.stringify(this.data2[i])) {
+        for(var i=0;i<this.selectedFood.length;i++){
+          if(temp == JSON.stringify(this.selectedFood[i])) {
               index = i;
               break;
           }
         }
-        if(index < this.data2.length) this.data2.splice(index,1);
+        if(index < this.selectedFood.length) this.selectedFood.splice(index,1);
         //sync UI
         e.target.setAttribute('icon','add')
         e.target.setAttribute('on-click','addItem')
@@ -193,46 +239,331 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           pickedfood.click();
         });
       },
+      chooseAllChoices: function(){
+        //push every remove button that is under the picked food list class
+        var pickedfoods = this.root.querySelectorAll('.fl > paper-icon-button')
+        pickedfoods.forEach(function(pickedfood){
+          pickedfood.click();
+        });
+      },
       displayThis: function(e){
-        console.log("Display function")
-        console.log(e.target.value)
         this.set("displayFood",e.target.value)
       },
       ready: function(){
-        this.data = [
-        {
-          name:"banana",
-          cost:15,
-          calories:10,
-          cholesterol:4,
-          total_fat: 10,
-          sodium: 0,
-          carbohydrates: 200,
-          fiber: 15,
-          protein: 2,
-          vitA: 20,
-          vitC: 0,
-          calcium: 0,
-          iron: 50
-        },
-        {
-          name: "machika",
-          cost:23,
-          calories:17,
-          cholesterol:23,
-          total_fat: 6,
-          sodium: 20,
-          carbohydrates: 86,
-          fiber: 25,
-          protein: 21,
-          vitA: 21,
-          vitC: 29,
-          calcium: 37,
-          iron: 86
+        //page setting function
+        for(var i=1;i<5;i++){
+          var l = this.root.querySelector('#page'+i)
+          if(this.pageNum != i) l.setAttribute('style','display: none; visibility: hidden');
+          else l.setAttribute('style','display: inline; visibility: visible');
         }
-        ]
-        var data2 = this.data2
-      }
+        this.root.querySelector('#infeasible').setAttribute('style','display: none; visibility: hidden;')
+        this.root.querySelector('#feasible').setAttribute('style','display: none; visibility: hidden;')
+      },
+      changePage: function(e){
+        //changes the css property of the group of buttons by page
+        var page_btn = this.root.querySelector('#pg'+this.pageNum)
+        page_btn.setAttribute('class','flex pg')
+        var food_page = this.root.querySelector('#page'+this.pageNum)
+        food_page.style.visibility = 'hidden'
+        food_page.style.display = 'none'
+        this.pageNum = e.target.getAttribute("value")
+        food_page = this.root.querySelector('#page'+this.pageNum)
+        food_page.style.visibility = 'visible'
+        food_page.style.display = 'inline'
+        page_btn = this.root.querySelector('#pg'+this.pageNum)
+        page_btn.setAttribute('class','flex pgn')
+        var s = this.root.querySelector('#food-page'+this.pageNum);
+        s.render();
+      },
+      solve: function() {
+        var pickedFoodList =  this.selectedFood;
+        console.log('')
+        var parseValToVar = function (val, index) {
+          var str = "";
+          if (index == 0) {
+            str = val.toString() + " * x" + (index+1).toString();
+          }
+          else {
+            str = " ";
+            if(val >= 0){
+              str = str + "+ ";
+            }
+            else {
+              str = str + "+ -";
+            }
+        
+            str = str + Math.abs(val).toString() + " * x" + (index+1).toString();
+          }
+          //console.log(str);
+          return str;
+        }
+        
+        var dietLnSys = function (foodList) {
+            var n = foodList.length;
+            var systems = [];
+            var x = 0;
+            var y = 0;
+            var rows = 23 + 2 * n;
+            //rows = 23 + 2 * n
+            //cols = rows + 2
+            var variables = "";
+            for(var i=0; i<foodList.length ;i++){
+              variables += "x"+(i+1).toString();
+              if(i+1 != foodList.length) {
+                variables += ",";
+              }
+            }
+            for(var i=0; i<rows; i++){
+              systems[i] = "E"+ (i+1).toString() + "<- function("+variables+") ";
+            }
+            //fill in every linear system with values from the database
+            for (var i=0; i<foodList.length; i++) {
+              //nutritional constraints
+              systems[0]+= parseValToVar(foodList[i][`calories`],i);
+              systems[1]+= parseValToVar(-foodList[i][`calories`],i);
+              systems[2]+=  parseValToVar(foodList[i][`cholesterol`],i);
+              systems[3]+= parseValToVar(-foodList[i][`cholesterol`],i);
+              systems[4]+=  parseValToVar(foodList[i][`totalFat`],i);
+              systems[5]+= parseValToVar(-foodList[i][`totalFat`],i);
+              systems[6]+=  parseValToVar(foodList[i][`sodium`],i);
+              systems[7]+= parseValToVar(-foodList[i][`sodium`],i);
+              systems[8]+=  parseValToVar(foodList[i][`carbohydrates`],i);
+              systems[9]+= parseValToVar(-foodList[i][`carbohydrates`],i);
+              systems[10]+=  parseValToVar(foodList[i][`fiber`],i);
+              systems[11]+= parseValToVar(-foodList[i][`fiber`],i);
+              systems[12]+=  parseValToVar(foodList[i][`protein`],i);
+              systems[13]+= parseValToVar(-foodList[i][`protein`],i);
+              systems[14]+=  parseValToVar(foodList[i][`vitA`],i);
+              systems[15]+= parseValToVar(-foodList[i][`vitA`],i);
+              systems[16]+=  parseValToVar(foodList[i][`vitC`],i);
+              systems[17]+= parseValToVar(-foodList[i][`vitC`],i);
+              systems[18]+=  parseValToVar(foodList[i][`calcium`],i);
+              systems[19]+= parseValToVar(-foodList[i][`calcium`],i);
+              systems[20]+=  parseValToVar(foodList[i][`iron`],i);
+              systems[21]+= parseValToVar(-foodList[i][`iron`],i);
+        
+              //quantity constraints
+              for(var j=22;j<rows-1;j++){
+                  if (j - 22 == i*2 || j - 23 == i*2) {
+                    if ((j-22)%2 == 0) {
+                      systems[j] += parseValToVar(1,i);
+                    }
+                    else {
+                      systems[j] += parseValToVar(-1,i);
+                    }
+                  }
+                  else {
+                    systems[j] += parseValToVar(0,i);
+                  }
+              }
+        
+              //console.log("COST"+i+":"+pickedFoodList[i].cost);
+              //objective function
+              systems[rows-1] += parseValToVar(foodList[i].cost,i);
+        
+            }
+            //RHS of every linear equation
+            systems[0]+= " + -2000"
+            systems[1]+= " + 2250"
+            systems[2]+= " + -0"
+            systems[3]+= " + 300"
+            systems[4]+= " + -0"
+            systems[5]+= " + 65"
+            systems[6]+= " + -0"
+            systems[7]+= " + 2400"
+            systems[8]+= " + -0"
+            systems[9]+= " + 300"
+            systems[10]+= " + -25"
+            systems[11]+= " + 100"
+            systems[12]+= " + -50"
+            systems[13]+= " + 100"
+            systems[14]+= " + -5000"
+            systems[15]+= " + 50000"
+            systems[16]+= " + -50"
+            systems[17]+= " + 20000"
+            systems[18]+= " + -800"
+            systems[19]+= " + 1600"
+            systems[20]+= " + -10"
+            systems[21]+= " + 30"
+            for(var i=22;i<rows;i++){
+                systems[i]+= ((i-22) % 2 == 0) ? " + -0" : " + 10"
+            }
+            //console.log(JSON.stringify(systems));
+            // for(i=0;i<systems.length; i++){
+            //   systems[i].replace("undefined\s[+-]\s","");
+            // }
+            console.log(systems.join("\n"));
+            return systems.join("; ");
+        }
+        var ls = dietLnSys(pickedFoodList);
+        var sys = "sys<- list(";
+        for (var i=0;i<(pickedFoodList.length * 2) + 23; i++) {
+          sys += "E" + (i+1).toString();
+          if(i+1 != (pickedFoodList.length * 2) + 23){
+            sys +=",";
+          }
+        }
+        sys +=")";
+        console.log('ls');
+        console.log(ls);
+        console.log('sys');
+        console.log(sys);
+        var mode = 1;
+        var simplexscr = "  AugCoeffMatrix <- function(system) {     equation <- NULL;     pos <- NULL;     ing <- NULL;     variables <- NULL;     for (i in seq(1, length(system), by=1)) {              current <- unlist(system[i]);       current <- deparse(current);              for (x in seq(2, length(current), by=1)) {         equation <- paste(equation, current[x], sep=\"\");       };       current = equation;       equation = NULL;              substr(current, nchar(current), nchar(current)) = \" \";              current <- strsplit(current, \"\\\\s+\");       current <- unlist(current);                     for (y in seq(1, length(current), by=1)) {         if (is.na(as.numeric(current[y]))) {           current[y] <- \"\";         } else {           break;         };       };       variableIndex = grep(\"x\", current);                     if (i > 1) {         if (csize != length(variableIndex)+1) {         };       };              csize <- length(variableIndex)+1;              for (x in seq(1, length(variableIndex), by=1)) {         pos[length(pos)+1] = as.numeric(substr(current[variableIndex[x]], 2, 3));       };              for (x in seq(1, length(variableIndex), by=1)) {         ing[length(ing)+1] = as.numeric(current[variableIndex[pos[x]]-2]);       };       for (x in seq(2, length(current), by=1)) {         if (substr(current[x], 1, 1) != \"x\") {           if (x == length(current)) {             ing[length(ing)+1] = current[x];           } else if (grepl(\"\\\\+\", current[x+1])) {              ing[length(ing)+1] = current[x];           };         };       };                     pos = c();     };          ing <- as.numeric(ing);          for (i in seq(csize, length(ing), by=csize)) {       ing[i] = ing[i] * -1;     };          mat = matrix(c(ing), nrow=length(system), ncol=csize, byrow=TRUE);          for (i in seq(1, csize-1, by=1)) {       variables[length(variables)+1] = paste(\"x\", i, sep=\"\");     };               rownames(mat) <- 1:length(system);     colnames(mat) <- c(variables, \"RHS\");          return(list(variables=variables, augcoeffmatrix=mat));        };      Simplex <- function(x,mode) {     mat <- AugCoeffMatrix(x)$augcoeffmatrix;     matrix <- mat;     iter <- 0;     compilation <- NULL;     x <- NULL;     if(mode == 1){       matrix <- t(mat);     };          matrix[nrow(matrix),] = matrix[nrow(matrix),] * -1;     matrix = cbind(matrix[ , 1:ncol(matrix)-1], diag(nrow(matrix)), matrix[ , ncol(matrix)]);     compilation[[1]] = matrix;     for(iter in seq(1, 10000,by=1)){       minCol <- which.min(matrix[nrow(matrix),]);       if(matrix[nrow(matrix),minCol] >= 0) {         return (compilation);       };       pCol <- matrix[,minCol];       rhsCol <- matrix[,ncol(matrix)];       rowVal <- rhsCol / pCol;       rowVal <- rowVal[1:length(rowVal)-1];              minRow <- which(rowVal == min(rowVal[which(rowVal > 0)]));       matrix[minRow,] = matrix[minRow,] / matrix[minRow,minCol];       for(i in seq(1,nrow(matrix),by=1)){         if(length(minRow) == 0) return (list());         if(i == minRow) next;         if(length(matrix[i,]) != length(matrix[i,] - (matrix[i,minCol]*matrix[minRow,]))) return (list());         matrix[i,] = matrix[i,] - (matrix[i,minCol]*matrix[minRow,]);       };       compilation[[iter+1]] = matrix;     };   };";
+        simplexscr += ls+";"+sys+"; Simplex(sys,"+mode+");";
+        var newSnippet = new ocpu.Snippet(simplexscr);
+        ocpu.seturl("//public.opencpu.org/ocpu/library/base/R");
+        var req = ocpu.rpc("identity", {
+            "x" : newSnippet
+        }, function(session){
+          console.log("RScript output");
+          console.log(session);
+          if(session.length != 0) {
+            var dietSolution = session[session.length-1][session[session.length-1].length-1];
+            var dietCost = dietSolution[dietSolution.length-1];
+            var dietServing = dietSolution.slice(dietSolution.length - this.selectedFood.length - 2, dietSolution.length-2);
+            var dietFoodList = [];
+            for(var i=0;i<this.selectedFood.length; i++) {
+              if(dietServing[i] == 0 ) continue;
+              var food = {};
+              food.name = this.selectedFood[i].name;
+              food.serving = Math.round(dietServing[i]*100)/100;
+              food.servingSize = this.selectedFood[i].serving;
+              food.cost = Math.round(this.selectedFood[i].cost * 100 * dietServing[i])/100;
+              dietFoodList.push(food);
+            }
+            console.log(`servings`);
+            console.log(dietFoodList);
+            var infeasible = this.root.querySelector('#infeasible');
+            infeasible.setAttribute('style','display: none; visibility: hidden;');
+            var table = this.root.querySelector('#feasible');
+            table.setAttribute('style','display: inline; visibility: visible;');
+            var tableInnerHTML = `<tr><th>Food</th><th>Serving</th><th>Serving Size</th><th>Food Cost</th></tr>`;
+            
+            for(i=0; i<dietFoodList.length; i++) {
+              tableInnerHTML += "<tr>";
+              tableInnerHTML += "<td>"+dietFoodList[i].name+"</td>";
+              tableInnerHTML += "<td>"+dietFoodList[i].serving+"</td>";
+              tableInnerHTML += "<td>"+dietFoodList[i].servingSize+"</td>";
+              tableInnerHTML += "<td>"+dietFoodList[i].cost+"</td>";
+              tableInnerHTML += "</tr>";
+            }
+            table.innerHTML = tableInnerHTML;
+            this.root.querySelector('#feasibleResults').innerHTML = "<h5>Total Diet Cost:"+dietCost+"</h5>";
+            this.root.querySelector('#feasibleResults').appendChild(table);
+          }
+          else {
+            var table = this.root.querySelector('#feasible');
+            table.setAttribute('style','display: none; visibility: hidden;');
+            var display = this.root.querySelector('#infeasible');
+            display.setAttribute('style','display: inline; visibility: visible;');
+            var s = "Your selected Foods: <br/>";
+            for(i=0;i<this.selectedFood.length; i++) {
+              s += " "+this.selectedFood[i].name+"&nbsp;&nbsp;&nbsp;";
+              if(s % 3 == 0) s+= "<br/>";
+            }
+            s += "</br> <h3>ARE INFEASIBLE</h3>";
+            display.innerHTML = s;
+          }
+        }.bind(this));
+      },
+      properties: {
+        displayFood: {
+          value: {}
+        },
+        selectedFood: {
+          type: Array,
+          value: []
+        },
+        pageNum: {
+          value: 1
+        },
+        //data values
+        foodpg1: {
+          type: Array,
+          value: [
+            {id:0,"name":"FrozenBroccoli","cost":0.16,"serving":"10 Oz Pkg","calories":73.8,"cholesterol":0,"totalFat":0.8,"sodium":68.2,"carbohydrates":13.6,"fiber":8.5,"protein":8,"vitA":5867.4,"vitC":160.2,"calcium":159,"iron":2.3},
+            {id:1,"name":"Carrots,Raw","cost":0.07,"serving":"1/2 CupShredded","calories":23.7,"cholesterol":0,"totalFat":0.1,"sodium":19.2,"carbohydrates":5.6,"fiber":1.6,"protein":0.6,"vitA":15471,"vitC":5.1,"calcium":14.9,"iron":0.3},
+            {id:2,"name":"Celery, Raw","cost":0.04,"serving":"1 Stalk","calories":6.4,"cholesterol":0,"totalFat":0.1,"sodium":34.8,"carbohydrates":1.5,"fiber":0.7,"protein":0.3,"vitA":53.6,"vitC":2.8,"calcium":16,"iron":0.2},
+            {id:3,"name":"Frozen Corn","cost":0.18,"serving":"1/2 Cup","calories":72.2,"cholesterol":0,"totalFat":0.6,"sodium":2.5,"carbohydrates":17.1,"fiber":2,"protein":2.5,"vitA":106.6,"vitC":5.2,"calcium":3.3,"iron":0.3},
+            {id:4,"name":"Lettuce,Iceberg,Raw","cost":0.02,"serving":"1 Leaf","calories":2.6,"cholesterol":0,"totalFat":0,"sodium":1.8,"carbohydrates":0.4,"fiber":0.3,"protein":0.2,"vitA":66,"vitC":0.8,"calcium":3.8,"iron":0.1},
+            {id:5,"name":"Peppers,Sweet, Raw","cost":0.53,"serving":"1 Pepper","calories":20,"cholesterol":0,"totalFat":0.1,"sodium":1.5,"carbohydrates":4.8,"fiber":1.3,"protein":0.7,"vitA":467.7,"vitC":66.1,"calcium":6.7,"iron":0.3},
+            {id:6,"name":"Potatoes,Baked","cost":0.06,"serving":"1/2 Cup","calories":171.5,"cholesterol":0,"totalFat":0.2,"sodium":15.2,"carbohydrates":39.9,"fiber":3.2,"protein":3.7,"vitA":0,"vitC":15.6,"calcium":22.7,"iron":4.3},
+            {id:7,"name":"Tofu","cost":0.31,"serving":"1/4 block","calories":88.2,"cholesterol":0,"totalFat":5.5,"sodium":8.1,"carbohydrates":2.2,"fiber":1.4,"protein":9.4,"vitA":98.6,"vitC":0.1,"calcium":121.8,"iron":6.2},
+            {id:8,"name":"RoastedChicken","cost":0.84,"serving":"1 lb chicken","calories":277.4,"cholesterol":129.9,"totalFat":10.8,"sodium":125.6,"carbohydrates":0,"fiber":0,"protein":42.2,"vitA":77.4,"vitC":0,"calcium":21.9,"iron":1.8},
+            {id:9,"name":"Spaghetti W/Sauce","cost":0.78,"serving":"1 1/2 Cup","calories":358.2,"cholesterol":0,"totalFat":12.3,"sodium":1237.1,"carbohydrates":58.3,"fiber":11.6,"protein":8.2,"vitA":3055.2,"vitC":27.9,"calcium":80.2,"iron":2.3},
+            {id:10,"name":"Tomato,Red,Ripe,Raw","cost":0.27,"serving":"1 Tomato, 2-3/5 In","calories":25.8,"cholesterol":0,"totalFat":0.4,"sodium":11.1,"carbohydrates":5.7,"fiber":1.4,"protein":1,"vitA":766.3,"vitC":23.5,"calcium":6.2,"iron":0.6},
+            {id:11,"name":"Apple,Raw,W/Skin","cost":0.24,"serving":"1Fruit,3/Lb,Wo/Rf","calories":81.4,"cholesterol":0,"totalFat":0.5,"sodium":0,"carbohydrates":21,"fiber":3.7,"protein":0.3,"vitA":73.1,"vitC":7.9,"calcium":9.7,"iron":0.2},
+            {id:12,"name":"Banana","cost":0.15,"serving":"1Fruit,Wo/Skn&Seeds","calories":104.9,"cholesterol":0,"totalFat":0.5,"sodium":1.1,"carbohydrates":26.7,"fiber":2.7,"protein":1.2,"vitA":92.3,"vitC":10.4,"calcium":6.8,"iron":0.4},
+            {id:13,"name":"Grapes","cost":0.32,"serving":"10Fruits,Wo/Rf","calories":15.1,"cholesterol":0,"totalFat":0.1,"sodium":0.5,"carbohydrates":4.1,"fiber":0.2,"protein":0.2,"vitA":24,"vitC":1,"calcium":3.4,"iron":0.1},
+            {id:14,"name":"Kiwifruit,Raw,Fresh","cost":0.49,"serving":"1 MedFrt,Wo/Skin","calories":46.4,"cholesterol":0,"totalFat":0.3,"sodium":3.8,"carbohydrates":11.3,"fiber":2.6,"protein":0.8,"vitA":133,"vitC":74.5,"calcium":19.8,"iron":0.3},
+            {id:15,"name":"Oranges","cost":0.15,"serving":"1 Frt,2-5/8Diam","calories":61.6,"cholesterol":0,"totalFat":0.2,"sodium":0,"carbohydrates":15.4,"fiber":3.1,"protein":1.2,"vitA":268.6,"vitC":69.7,"calcium":52.4,"iron":0.1},
+          ]
+        },
+        foodpg2: {
+          type: Array,
+          value: [
+            {id:16,"name":"Bagels","cost":0.16,"serving":"1 Oz","calories":78,"cholesterol":0,"totalFat":0.5,"sodium":151.4,"carbohydrates":15.1,"fiber":0.6,"protein":3,"vitA":0,"vitC":0,"calcium":21,"iron":1},
+            {id:17,"name":"Wheat Bread","cost":0.05,"serving":"1 Sl","calories":65,"cholesterol":0,"totalFat":1,"sodium":134.5,"carbohydrates":12.4,"fiber":1.3,"protein":2.2,"vitA":0,"vitC":0,"calcium":10.8,"iron":0.7},
+            {id:18,"name":"White Bread","cost":0.06,"serving":"1 Sl","calories":65,"cholesterol":0,"totalFat":1,"sodium":132.5,"carbohydrates":11.8,"fiber":1.1,"protein":2.3,"vitA":0,"vitC":0,"calcium":26.2,"iron":0.8},
+            {id:19,"name":"OatmealCookies","cost":0.09,"serving":"1 Cookie","calories":81,"cholesterol":0,"totalFat":3.3,"sodium":68.9,"carbohydrates":12.4,"fiber":0.6,"protein":1.1,"vitA":2.9,"vitC":0.1,"calcium":6.7,"iron":0.5},
+            {id:20,"name":"Apple Pie","cost":0.16,"serving":"1 Oz","calories":67.2,"cholesterol":0,"totalFat":3.1,"sodium":75.4,"carbohydrates":9.6,"fiber":0.5,"protein":0.5,"vitA":35.2,"vitC":0.9,"calcium":3.1,"iron":0.1},
+            {id:21,"name":"ChocolateChip Cookies","cost":0.03,"serving":"1 Cookie","calories":78.1,"cholesterol":5.1,"totalFat":4.5,"sodium":57.8,"carbohydrates":9.3,"fiber":0,"protein":0.9,"vitA":101.8,"vitC":0,"calcium":6.2,"iron":0.4},
+            {id:22,"name":"Butter,Regular","cost":0.05,"serving":"1 Pat","calories":35.8,"cholesterol":10.9,"totalFat":4.1,"sodium":41.3,"carbohydrates":0,"fiber":0,"protein":0,"vitA":152.9,"vitC":0,"calcium":1.2,"iron":0},
+            {id:23,"name":"CheddarCheese","cost":0.25,"serving":"1 Oz","calories":112.7,"cholesterol":29.4,"totalFat":9.3,"sodium":173.7,"carbohydrates":0.4,"fiber":0,"protein":7,"vitA":296.5,"vitC":0,"calcium":202,"iron":0.2},
+            {id:24,"name":"3.3%Fat,WholeMilk","cost":0.16,"serving":"1 C","calories":149.9,"cholesterol":33.2,"totalFat":8.1,"sodium":119.6,"carbohydrates":11.4,"fiber":0,"protein":8,"vitA":307.4,"vitC":2.3,"calcium":291.3,"iron":0.1},
+            {id:25,"name":"2% LowfatMilk","cost":0.23,"serving":"1 C","calories":121.2,"cholesterol":18.3,"totalFat":4.7,"sodium":121.8,"carbohydrates":11.7,"fiber":0,"protein":8.1,"vitA":500.2,"vitC":2.3,"calcium":296.7,"iron":0.1},
+            {id:26,"name":"Skim Milk","cost":0.13,"serving":"1 C","calories":85.5,"cholesterol":4.4,"totalFat":0.4,"sodium":126.2,"carbohydrates":11.9,"fiber":0,"protein":8.4,"vitA":499.8,"vitC":2.4,"calcium":302.3,"iron":0.1},
+            {id:27,"name":"Poached Eggs","cost":0.08,"serving":"Lrg Egg","calories":74.5,"cholesterol":211.5,"totalFat":5,"sodium":140,"carbohydrates":0.6,"fiber":0,"protein":6.2,"vitA":316,"vitC":0,"calcium":24.5,"iron":0.7},
+            {id:28,"name":"ScrambledEggs","cost":0.11,"serving":"1 Egg","calories":99.6,"cholesterol":211.2,"totalFat":7.3,"sodium":168,"carbohydrates":1.3,"fiber":0,"protein":6.7,"vitA":409.2,"vitC":0.1,"calcium":42.6,"iron":0.7},
+            {id:29,"name":"Bologna,Turkey","cost":0.15,"serving":"1 Oz","calories":56.4,"cholesterol":28.1,"totalFat":4.3,"sodium":248.9,"carbohydrates":0.3,"fiber":0,"protein":3.9,"vitA":0,"vitC":0,"calcium":23.8,"iron":0.4},
+            {id:30,"name":"Frankfurter,Beef","cost":0.27,"serving":"1 Frankfurter","calories":141.8,"cholesterol":27.4,"totalFat":12.8,"sodium":461.7,"carbohydrates":0.8,"fiber":0,"protein":5.4,"vitA":0,"vitC":10.8,"calcium":9,"iron":0.6},
+            {id:31,"name":"Ham,Sliced,Extralean","cost":0.33,"serving":"1 Sl,6-1/4x4x1/16 In","calories":37.1,"cholesterol":13.3,"totalFat":1.4,"sodium":405.1,"carbohydrates":0.3,"fiber":0,"protein":5.5,"vitA":0,"vitC":7.4,"calcium":2,"iron":0.2},
+            ]
+        },
+        foodpg3: {
+          type: Array,
+          value: [
+            {id:32,"name":"Kielbasa,Prk","cost":0.15,"serving":"1 Sl,6x3-3/4x1/16 In","calories":80.6,"cholesterol":17.4,"totalFat":7.1,"sodium":279.8,"carbohydrates":0.6,"fiber":0,"protein":3.4,"vitA":0,"vitC":5.5,"calcium":11.4,"iron":0.4},
+            {id:33,"name":"Cap'N Crunch","cost":0.31,"serving":"1 Oz","calories":119.6,"cholesterol":0,"totalFat":2.6,"sodium":213.3,"carbohydrates":23,"fiber":0.5,"protein":1.4,"vitA":40.6,"vitC":0,"calcium":4.8,"iron":7.5},
+            {id:34,"name":"Cheerios","cost":0.28,"serving":"1 Oz","calories":111,"cholesterol":0,"totalFat":1.8,"sodium":307.6,"carbohydrates":19.6,"fiber":2,"protein":4.3,"vitA":1252.2,"vitC":15.1,"calcium":48.6,"iron":4.5},
+            {id:35,"name":"Corn Flks,Kellogg'S","cost":0.28,"serving":"1 Oz","calories":110.5,"cholesterol":0,"totalFat":0.1,"sodium":290.5,"carbohydrates":24.5,"fiber":0.7,"protein":2.3,"vitA":1252.2,"vitC":15.1,"calcium":0.9,"iron":1.8},
+            {id:36,"name":"Raisin Brn,Kellg'S","cost":0.34,"serving":"1.3 Oz","calories":115.1,"cholesterol":0,"totalFat":0.7,"sodium":204.4,"carbohydrates":27.9,"fiber":4,"protein":4,"vitA":1250.2,"vitC":0,"calcium":12.9,"iron":16.8},
+            {id:37,"name":"Rice Krispies","cost":0.32,"serving":"1 Oz","calories":112.2,"cholesterol":0,"totalFat":0.2,"sodium":340.8,"carbohydrates":24.8,"fiber":0.4,"protein":1.9,"vitA":1252.2,"vitC":15.1,"calcium":4,"iron":1.8},
+            {id:38,"name":"Special K","cost":0.38,"serving":"1 Oz","calories":110.8,"cholesterol":0,"totalFat":0.1,"sodium":265.5,"carbohydrates":21.3,"fiber":0.7,"protein":5.6,"vitA":1252.2,"vitC":15.1,"calcium":8.2,"iron":4.5},
+            {id:39,"name":"Oatmeal","cost":0.82,"serving":"1 C","calories":145.1,"cholesterol":0,"totalFat":2.3,"sodium":2.3,"carbohydrates":25.3,"fiber":4,"protein":6.1,"vitA":37.4,"vitC":0,"calcium":18.7,"iron":1.6},
+            {id:40,"name":"Malt-O-Meal,Choc","cost":0.52,"serving":"1 C","calories":607.2,"cholesterol":0,"totalFat":1.5,"sodium":16.5,"carbohydrates":128.2,"fiber":0,"protein":17.3,"vitA":0,"vitC":0,"calcium":23.1,"iron":47.2},
+            {id:41,"name":"PizzaW/Pepperoni","cost":0.44,"serving":"1 Slice","calories":181,"cholesterol":14.2,"totalFat":7,"sodium":267,"carbohydrates":19.9,"fiber":0,"protein":10.1,"vitA":281.9,"vitC":1.6,"calcium":64.6,"iron":0.9},
+            {id:42,"name":"Taco","cost":0.59,"serving":"1 Small Taco","calories":369.4,"cholesterol":56.4,"totalFat":20.6,"sodium":802,"carbohydrates":26.7,"fiber":0,"protein":20.7,"vitA":855,"vitC":2.2,"calcium":220.6,"iron":2.4},
+            {id:43,"name":"HamburgerW/Toppings","cost":0.83,"serving":"1 Burger","calories":275,"cholesterol":42.8,"totalFat":10.2,"sodium":563.9,"carbohydrates":32.7,"fiber":0,"protein":13.6,"vitA":126.3,"vitC":2.6,"calcium":51.4,"iron":2.5},
+            {id:44,"name":"Hotdog, Plain","cost":0.31,"serving":"1 Hotdog","calories":242.1,"cholesterol":44.1,"totalFat":14.5,"sodium":670.3,"carbohydrates":18,"fiber":0,"protein":10.4,"vitA":0,"vitC":0.1,"calcium":23.5,"iron":2.3},
+            {id:45,"name":"Couscous","cost":0.39,"serving":"1/2 Cup","calories":100.8,"cholesterol":0,"totalFat":0.1,"sodium":4.5,"carbohydrates":20.9,"fiber":1.3,"protein":3.4,"vitA":0,"vitC":0,"calcium":7.2,"iron":0.3},
+            {id:46,"name":"White Rice","cost":0.08,"serving":"1/2 Cup","calories":102.7,"cholesterol":0,"totalFat":0.2,"sodium":0.8,"carbohydrates":22.3,"fiber":0.3,"protein":2.1,"vitA":0,"vitC":0,"calcium":7.9,"iron":0.9},
+            {id:47,"name":"Macaroni,Ckd","cost":0.17,"serving":"1/2 Cup","calories":98.7,"cholesterol":0,"totalFat":0.5,"sodium":0.7,"carbohydrates":19.8,"fiber":0.9,"protein":3.3,"vitA":0,"vitC":0,"calcium":4.9,"iron":1},
+            ]
+        },
+        foodpg4: {
+          type: Array,
+          value: [
+            {id:48,"name":"Peanut Butter","cost":0.07,"serving":"2 Tbsp","calories":188.5,"cholesterol":0,"totalFat":16,"sodium":155.5,"carbohydrates":6.9,"fiber":2.1,"protein":7.7,"vitA":0,"vitC":0,"calcium":13.1,"iron":0.6},
+            {id:49,"name":"Pork","cost":0.81,"serving":"4 Oz","calories":710.8,"cholesterol":105.1,"totalFat":72.2,"sodium":38.4,"carbohydrates":0,"fiber":0,"protein":13.8,"vitA":14.7,"vitC":0,"calcium":59.9,"iron":0.4},
+            {id:50,"name":"Sardines in Oil","cost":0.45,"serving":"2 Sardines","calories":49.9,"cholesterol":34.1,"totalFat":2.7,"sodium":121.2,"carbohydrates":0,"fiber":0,"protein":5.9,"vitA":53.8,"vitC":0,"calcium":91.7,"iron":0.7},
+            {id:51,"name":"White Tuna inWater","cost":0.69,"serving":"3 Oz","calories":115.6,"cholesterol":35.7,"totalFat":2.1,"sodium":333.2,"carbohydrates":0,"fiber":0,"protein":22.7,"vitA":68,"vitC":0,"calcium":3.4,"iron":0.5},
+            {id:52,"name":"Popcorn,Air-Popped","cost":0.04,"serving":"1 Oz","calories":108.3,"cholesterol":0,"totalFat":1.2,"sodium":1.1,"carbohydrates":22.1,"fiber":4.3,"protein":3.4,"vitA":55.6,"vitC":0,"calcium":2.8,"iron":0.8},
+            {id:53,"name":"PotatoChips,Bbqflvr","cost":0.22,"serving":"1 Oz","calories":139.2,"cholesterol":0,"totalFat":9.2,"sodium":212.6,"carbohydrates":15,"fiber":1.2,"protein":2.2,"vitA":61.5,"vitC":9.6,"calcium":14.2,"iron":0.5},
+            {id:54,"name":"Pretzels","cost":0.12,"serving":"1 Oz","calories":108,"cholesterol":0,"totalFat":1,"sodium":486.2,"carbohydrates":22.5,"fiber":0.9,"protein":2.6,"vitA":0,"vitC":0,"calcium":10.2,"iron":1.2},
+            {id:55,"name":"Tortilla Chip","cost":0.19,"serving":"1 Oz","calories":142,"cholesterol":0,"totalFat":7.4,"sodium":149.7,"carbohydrates":17.8,"fiber":1.8,"protein":2,"vitA":55.6,"vitC":0,"calcium":43.7,"iron":0.4},
+            {id:56,"name":"ChicknoodlSoup","cost":0.39,"serving":"1 C (8 Fl Oz)","calories":150.1,"cholesterol":12.3,"totalFat":4.6,"sodium":1862.2,"carbohydrates":18.7,"fiber":1.5,"protein":7.9,"vitA":1308.7,"vitC":0,"calcium":27.1,"iron":1.5},
+            {id:57,"name":"SpltPea&Hamsoup","cost":0.67,"serving":"1 C (8 Fl Oz)","calories":184.8,"cholesterol":7.2,"totalFat":4,"sodium":964.8,"carbohydrates":26.8,"fiber":4.1,"protein":11.1,"vitA":4872,"vitC":7,"calcium":33.6,"iron":2.1},
+            {id:58,"name":"VegetbeefSoup","cost":0.71,"serving":"1 C (8 Fl Oz)","calories":158.1,"cholesterol":10,"totalFat":3.8,"sodium":1915.1,"carbohydrates":20.4,"fiber":4,"protein":11.2,"vitA":3785.1,"vitC":4.8,"calcium":32.6,"iron":2.2},
+            {id:59,"name":"NewengClamchwd","cost":0.75,"serving":"1 C (8 Fl Oz)","calories":175.7,"cholesterol":10,"totalFat":5,"sodium":1864.9,"carbohydrates":21.8,"fiber":1.5,"protein":10.9,"vitA":20.1,"vitC":4.8,"calcium":82.8,"iron":2.8},
+            {id:60,"name":"Tomato Soup","cost":0.39,"serving":"1 C (8 Fl Oz)","calories":170.7,"cholesterol":0,"totalFat":3.8,"sodium":1744.4,"carbohydrates":33.2,"fiber":1,"protein":4.1,"vitA":1393,"vitC":133,"calcium":27.6,"iron":3.5},
+            {id:61,"name":"New EClamchwd,W/Mlk","cost":0.99,"serving":"1 C (8 Fl Oz)","calories":163.7,"cholesterol":22.3,"totalFat":6.6,"sodium":992,"carbohydrates":16.6,"fiber":1.5,"protein":9.5,"vitA":163.7,"vitC":3.5,"calcium":186,"iron":1.5},
+            {id:62,"name":"Crm MshrmSoup,W/Mlk","cost":0.65,"serving":"1 C (8 Fl Oz)","calories":203.4,"cholesterol":19.8,"totalFat":13.6,"sodium":1076.3,"carbohydrates":15,"fiber":0.5,"protein":6.1,"vitA":153.8,"vitC":2.2,"calcium":178.6,"iron":0.6},
+            {id:63,"name":"BeanbacnSoup,W/Watr","cost":0.67,"serving":"1 C (8 Fl Oz)","calories":172,"cholesterol":2.5,"totalFat":5.9,"sodium":951.3,"carbohydrates":22.8,"fiber":8.6,"protein":7.9,"vitA":888,"vitC":1.5,"calcium":81,"iron":2}
+            ]
+        }
+      },
     });
   </script>
 </dom-module>
