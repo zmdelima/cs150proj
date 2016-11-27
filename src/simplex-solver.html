@@ -98,16 +98,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
          reflectToAttribute: true
        } 
       },
-      hurry: function(){
-        console.log("HURRY!");
-        console.log("HURRY2!");
-        console.log("HURRY3!");
-        console.log("HURRY4!");
-      },
       ready: function(){
-        this.hurry();
+        
       },
       changeMode : function(){
+        //function for changing optimization mode in the UI
         if (this.root.querySelector('#mode').innerHTML == "MAXIMIZATION") {
           this.root.querySelector('#mode').setAttribute('style',"background-color: black; color: white;");
           this.root.querySelector('#mode').innerHTML = "MINIMIZATION";
@@ -117,10 +112,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
       },
       toggleIneq :function(e) {
-        console.log("ineq!");
-        console.log(e.target);
+        //function for toggling the inequality in the UI        
         if (e.target.getAttribute('value') == 0) {
-          console.log('<=');
+          
           e.target.setAttribute('style',"background-color: black; color: white;");
           e.target.innerHTML = ">=";
           e.target.setAttribute('value',1);
@@ -131,10 +125,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
       },
       addConstraint : function(){
+        //functoin for adding a constraint to the UI
         this.constraints.push("");
         this.root.querySelector('#fxn').render();
       },
       getChildIndex : function(child){
+        //function for getting a node's index in respect to its parent
         var parent = child.parentNode;
         var children = parent.children;
         var i = children.length - 1;
@@ -146,13 +142,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         return i;
       },
       removeConstraint : function(e){
-        console.log('removing Constraint');
+        //function for removing the last constraint in the UI
         this.constraints.splice(0,1);
         this.root.querySelector('#fxn').render();
       },
       negateFunc : function(equation){
+        //function to negate equation coefficient values
         var func = equation.split(" ");
-        console.log(func);
+        
         for(var i=0; i<func.length; i++){
           if(!isNaN(parseFloat(func[i]))) {
             func[i] = (((parseFloat(func[i])*-1)*10)/10).toString();
@@ -160,11 +157,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           }
         }
         equation = func.join(" ");
-        console.log('negated equation');
-        console.log(equation);
         return equation;
       },
       countVar : function(equation){
+        //function returning every variable "x" of the equation
         return equation.split("x").length-1;
       },
       solve : function(){
@@ -181,7 +177,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           }
           this.constraints[i] = conts[i].value;
         }
-        
+        //for ensuring that every linear function has the same length of variables
         var prev_count = this.countVar(this.root.querySelector("#objective").value);
         var var_count = 0;
         for (var i=0; i<conts.length; i++) {
@@ -205,12 +201,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             if(mode == 1) this.constraints[i] = this.negateFunc(this.constraints[i]);
           }
         }
-        
-        console.log("constraints");
-        console.log(this.constraints);
-        
         var ls = [];
         var variables = "";
+        //creation of variables for the number of every function variable in the rscript
         for(var j=0; j<var_count; j++){
             variables += "x"+(j+1).toString();
             if(j+1 != var_count) {
@@ -223,12 +216,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           ls[i] += ") "+this.constraints[i];
         }
         
-        console.log("linsys")
         var joinls = ls.join("; ") + "; ";
         joinls += "E"+(this.constraints.length+1)+"<- function("+variables+") "+this.root.querySelector('#objective').value;
-        console.log('LINEAR SYSTEEEMS');
-        console.log(joinls);
-        
+        //creation of the list of linear equations
         var sys = " sys<- list(";
         for (i=0; i<ineqs.length+1; i++) {
           sys += "E" + (i+1).toString();
@@ -238,19 +228,18 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
         sys +=")";
         
-        console.log('sys');
-        console.log(sys);
+        //creating up of linear systems and the whole rscript to be used
         var mode = (this.root.querySelector('#mode').innerHTML == "MAXIMIZATION") ? 0 : 1;
         var simplexscr = "  AugCoeffMatrix <- function(system) {     equation <- NULL;     pos <- NULL;     ing <- NULL;     variables <- NULL;     for (i in seq(1, length(system), by=1)) {              current <- unlist(system[i]);       current <- deparse(current);              for (x in seq(2, length(current), by=1)) {         equation <- paste(equation, current[x], sep=\"\");       };       current = equation;       equation = NULL;              substr(current, nchar(current), nchar(current)) = \" \";              current <- strsplit(current, \"\\\\s+\");       current <- unlist(current);                     for (y in seq(1, length(current), by=1)) {         if (is.na(as.numeric(current[y]))) {           current[y] <- \"\";         } else {           break;         };       };       variableIndex = grep(\"x\", current);                     if (i > 1) {         if (csize != length(variableIndex)+1) {         };       };              csize <- length(variableIndex)+1;              for (x in seq(1, length(variableIndex), by=1)) {         pos[length(pos)+1] = as.numeric(substr(current[variableIndex[x]], 2, 3));       };              for (x in seq(1, length(variableIndex), by=1)) {         ing[length(ing)+1] = as.numeric(current[variableIndex[pos[x]]-2]);       };       for (x in seq(2, length(current), by=1)) {         if (substr(current[x], 1, 1) != \"x\") {           if (x == length(current)) {             ing[length(ing)+1] = current[x];           } else if (grepl(\"\\\\+\", current[x+1])) {              ing[length(ing)+1] = current[x];           };         };       };                     pos = c();     };          ing <- as.numeric(ing);          for (i in seq(csize, length(ing), by=csize)) {       ing[i] = ing[i] * -1;     };          mat = matrix(c(ing), nrow=length(system), ncol=csize, byrow=TRUE);          for (i in seq(1, csize-1, by=1)) {       variables[length(variables)+1] = paste(\"x\", i, sep=\"\");     };               rownames(mat) <- 1:length(system);     colnames(mat) <- c(variables, \"RHS\");          return(list(variables=variables, augcoeffmatrix=mat));        };      Simplex <- function(x,mode) {     mat <- AugCoeffMatrix(x)$augcoeffmatrix;     matrix <- mat;     iter <- 0;     compilation <- NULL;     x <- NULL;     if(mode == 1){       matrix <- t(mat);     };          matrix[nrow(matrix),] = matrix[nrow(matrix),] * -1;     matrix = cbind(matrix[ , 1:ncol(matrix)-1], diag(nrow(matrix)), matrix[ , ncol(matrix)]);     compilation[[1]] = matrix;     for(iter in seq(1, 10000,by=1)){       minCol <- which.min(matrix[nrow(matrix),]);       if(matrix[nrow(matrix),minCol] >= 0) {         return (compilation);       };       pCol <- matrix[,minCol];       rhsCol <- matrix[,ncol(matrix)];       rowVal <- rhsCol / pCol;       rowVal <- rowVal[1:length(rowVal)-1];              minRow <- which(rowVal == min(rowVal[which(rowVal > 0)]));       matrix[minRow,] = matrix[minRow,] / matrix[minRow,minCol];       if(is.infinite(matrix[minRow,minCol]) || is.nan(matrix[minRow,minCol])){         return (list());       };       for(i in seq(1,nrow(matrix),by=1)){         if(length(minRow) == 0) return (list());         if(i == minRow) next;         if(length(matrix[i,]) != length(matrix[i,] - (matrix[i,minCol]*matrix[minRow,]))) return (list());         matrix[i,] = matrix[i,] - (matrix[i,minCol]*matrix[minRow,]);       };       compilation[[iter+1]] = matrix;     };   };";
         simplexscr += joinls+";"+sys+"; Simplex(sys,"+mode+");";
-        console.log(simplexscr)
+        
         var newSnippet = new ocpu.Snippet(simplexscr);
         ocpu.seturl("//public.opencpu.org/ocpu/library/base/R");
         var req = ocpu.rpc("identity", {
             "x" : newSnippet
         }, function(session){
-          console.log("RScript output");
-          console.log(session);
+          
+          
           var cols = (this.constraints.length + var_count) + 2;
           if(session.length != 0) {
             this.root.querySelector('#iterations').innerHTML = "";
@@ -265,16 +254,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               solHeader.innerHTML = "Basic solution";
               var solTable = document.createElement("table");
               solTable.setAttribute('id','sol'+i.toString());
-              
               var header = "<thead><tr>";
-              
+              //creation of table headers for the table elements 
               for(var j=0; j<cols; j++){
                 header += "<th>";
                 if (j < var_count) {
                   if (this.root.querySelector('#mode').innerHTML == "MAXIMIZATION") {
                     header += "x"+(j+1).toString();
                   } else {
-                    console.log("minimization header @ s:"+j);
+                    
                     header += "s"+(j+1).toString();
                   }
                 } else if (j == cols-2) {
@@ -285,7 +273,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                   if (this.root.querySelector('#mode').innerHTML == "MAXIMIZATION") {
                     header += "s"+(j-var_count+1).toString();
                   } else {
-                    console.log("minimization header @ x:"+j);
+                    
                     header += "x"+(j-var_count+1).toString();
                   }
                 }
@@ -304,11 +292,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               }
               cell +="</tbody>"
               var getBasicSol = function(tableu) {
+                //get values of the current basic solution variables and slack
                 var ret = [];
-                console.log("tableu");
-                console.log(tableu);
-                console.log("length");
-                console.log(tableu[0]);
                 var rhs = tableu[0].length-1;
                 for(var k=0; k<rhs; k++){
                   var temp_col = [];
@@ -321,21 +306,21 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                   var one_count  = temp_col.reduce(function(n, val) {
                       return n + (val == 1);
                   }, 0);
-                  console.log('one_count:'+one_count)
-                  console.log('zero_count:'+zero_count);
+                  
+                  
                   if(one_count + zero_count == this.constraints.length+1) {
-                    console.log('pushing value');
-                    console.log(tableu[temp_col.indexOf(1)][rhs]);
+                    
+                    
                     ret.push(tableu[temp_col.indexOf(1)][rhs]);
                   } else {
-                    console.log('pushing 0');
+                    
                     ret.push(0);
                   }
-                  console.log('temp col '+k.toString());
-                  console.log(temp_col);
+                  
+                  
                 }
-                console.log('returning array');
-                console.log(ret)
+                
+                
                 return (ret);
               }.bind(this);
               
@@ -349,8 +334,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               solCell += "</tr>";
               solCell +="</tbody>";
               
-              console.log(header);
-              console.log(cell);
+              //creating the current iteration tableu and basic solution table
               table.innerHTML = header + cell;
               solTable.innerHTML = header + solCell;
               
