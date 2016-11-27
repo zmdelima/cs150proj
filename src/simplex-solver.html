@@ -100,16 +100,19 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       },
       hurry: function(){
         console.log("HURRY!");
+        console.log("HURRY2!");
+        console.log("HURRY3!");
+        console.log("HURRY4!");
       },
       ready: function(){
         this.hurry();
       },
       changeMode : function(){
         if (this.root.querySelector('#mode').innerHTML == "MAXIMIZATION") {
-          this.root.querySelector('#mode').setAttribute('style',`background-color: black; color: white;`);
+          this.root.querySelector('#mode').setAttribute('style',"background-color: black; color: white;");
           this.root.querySelector('#mode').innerHTML = "MINIMIZATION";
         } else {
-          this.root.querySelector('#mode').setAttribute('style',`background-color: white; color: black;`);
+          this.root.querySelector('#mode').setAttribute('style',"background-color: white; color: black;");
           this.root.querySelector('#mode').innerHTML = "MAXIMIZATION";
         }
       },
@@ -118,11 +121,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         console.log(e.target);
         if (e.target.getAttribute('value') == 0) {
           console.log('<=');
-          e.target.setAttribute('style',`background-color: black; color: white;`);
+          e.target.setAttribute('style',"background-color: black; color: white;");
           e.target.innerHTML = ">=";
           e.target.setAttribute('value',1);
         } else {
-          e.target.setAttribute('style',`background-color: white; color: black;`);
+          e.target.setAttribute('style',"background-color: white; color: black;");
           e.target.innerHTML = "<=";
           e.target.setAttribute('value',0);
         }
@@ -268,13 +271,23 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               for(var j=0; j<cols; j++){
                 header += "<th>";
                 if (j < var_count) {
-                  header += "x"+(j+1).toString();
+                  if (this.root.querySelector('#mode').innerHTML == "MAXIMIZATION") {
+                    header += "x"+(j+1).toString();
+                  } else {
+                    console.log("minimization header @ s:"+j);
+                    header += "s"+(j+1).toString();
+                  }
                 } else if (j == cols-2) {
                   header += "Z"; 
                 } else if (j == cols-1) {
                   header += "RHS"; 
                 } else {
-                  header += "s"+(j-var_count+1).toString();
+                  if (this.root.querySelector('#mode').innerHTML == "MAXIMIZATION") {
+                    header += "s"+(j-var_count+1).toString();
+                  } else {
+                    console.log("minimization header @ x:"+j);
+                    header += "x"+(j-var_count+1).toString();
+                  }
                 }
                 header += "</th>";
               }
@@ -292,9 +305,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               cell +="</tbody>"
               var getBasicSol = function(tableu) {
                 var ret = [];
-                console.log(`tableu`);
+                console.log("tableu");
                 console.log(tableu);
-                console.log(`length`);
+                console.log("length");
                 console.log(tableu[0]);
                 var rhs = tableu[0].length-1;
                 for(var k=0; k<rhs; k++){

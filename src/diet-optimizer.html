@@ -106,11 +106,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         
           <div id="buttons">
             <h4 id="fc-title">Food Choices</h4>
-            <div id="pages" class="horizontal layout">
-              <paper-button id="pg1" class="flex pgn" on-click="changePage" value=1>1</paper-button>
-              <paper-button id="pg2" class="flex pg" on-click="changePage" value=2>2</paper-button>
-              <paper-button id="pg3" class="flex pg" on-click="changePage" value=3>3</paper-button>
-              <paper-button id="pg4" class="flex pg" on-click="changePage" value=4>4</paper-button>
+            <div id="pages">
+              <paper-button id="pg1" class="pgn" on-click="changePage" value=1>1</paper-button>
+              <paper-button id="pg2" class="pg" on-click="changePage" value=2>2</paper-button>
+              <paper-button id="pg3" class="pg" on-click="changePage" value=3>3</paper-button>
+              <paper-button id="pg4" class="pg" on-click="changePage" value=4>4</paper-button>
             </div>
             <div id="food-container" class="card fc">
                 <div id="page1">
@@ -231,7 +231,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       changePage: function(e){
         //changes the css property of the group of buttons by page
         var page_btn = this.root.querySelector('#pg'+this.pageNum)
-        page_btn.setAttribute('class','flex pg')
+        page_btn.setAttribute('class','pg')
         var food_page = this.root.querySelector('#page'+this.pageNum)
         food_page.style.visibility = 'hidden'
         food_page.style.display = 'none'
@@ -240,7 +240,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         food_page.style.visibility = 'visible'
         food_page.style.display = 'inline'
         page_btn = this.root.querySelector('#pg'+this.pageNum)
-        page_btn.setAttribute('class','flex pgn')
+        page_btn.setAttribute('class','pgn')
         var s = this.root.querySelector('#food-page'+this.pageNum);
         s.render();
       },
@@ -288,28 +288,28 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             //fill in every linear system with values from the database
             for (var i=0; i<foodList.length; i++) {
               //nutritional constraints
-              systems[0]+= parseValToVar(foodList[i][`calories`],i);
-              systems[1]+= parseValToVar(-foodList[i][`calories`],i);
-              systems[2]+=  parseValToVar(foodList[i][`cholesterol`],i);
-              systems[3]+= parseValToVar(-foodList[i][`cholesterol`],i);
-              systems[4]+=  parseValToVar(foodList[i][`totalFat`],i);
-              systems[5]+= parseValToVar(-foodList[i][`totalFat`],i);
-              systems[6]+=  parseValToVar(foodList[i][`sodium`],i);
-              systems[7]+= parseValToVar(-foodList[i][`sodium`],i);
-              systems[8]+=  parseValToVar(foodList[i][`carbohydrates`],i);
-              systems[9]+= parseValToVar(-foodList[i][`carbohydrates`],i);
-              systems[10]+=  parseValToVar(foodList[i][`fiber`],i);
-              systems[11]+= parseValToVar(-foodList[i][`fiber`],i);
-              systems[12]+=  parseValToVar(foodList[i][`protein`],i);
-              systems[13]+= parseValToVar(-foodList[i][`protein`],i);
-              systems[14]+=  parseValToVar(foodList[i][`vitA`],i);
-              systems[15]+= parseValToVar(-foodList[i][`vitA`],i);
-              systems[16]+=  parseValToVar(foodList[i][`vitC`],i);
-              systems[17]+= parseValToVar(-foodList[i][`vitC`],i);
-              systems[18]+=  parseValToVar(foodList[i][`calcium`],i);
-              systems[19]+= parseValToVar(-foodList[i][`calcium`],i);
-              systems[20]+=  parseValToVar(foodList[i][`iron`],i);
-              systems[21]+= parseValToVar(-foodList[i][`iron`],i);
+              systems[0]+= parseValToVar(foodList[i]["calories"],i);
+              systems[1]+= parseValToVar(-foodList[i]["calories"],i);
+              systems[2]+=  parseValToVar(foodList[i]["cholesterol"],i);
+              systems[3]+= parseValToVar(-foodList[i]["cholesterol"],i);
+              systems[4]+=  parseValToVar(foodList[i]["totalFat"],i);
+              systems[5]+= parseValToVar(-foodList[i]["totalFat"],i);
+              systems[6]+=  parseValToVar(foodList[i]["sodium"],i);
+              systems[7]+= parseValToVar(-foodList[i]["sodium"],i);
+              systems[8]+=  parseValToVar(foodList[i]["carbohydrates"],i);
+              systems[9]+= parseValToVar(-foodList[i]["carbohydrates"],i);
+              systems[10]+=  parseValToVar(foodList[i]["fiber"],i);
+              systems[11]+= parseValToVar(-foodList[i]["fiber"],i);
+              systems[12]+=  parseValToVar(foodList[i]["protein"],i);
+              systems[13]+= parseValToVar(-foodList[i]["protein"],i);
+              systems[14]+=  parseValToVar(foodList[i]["vitA"],i);
+              systems[15]+= parseValToVar(-foodList[i]["vitA"],i);
+              systems[16]+=  parseValToVar(foodList[i]["vitC"],i);
+              systems[17]+= parseValToVar(-foodList[i]["vitC"],i);
+              systems[18]+=  parseValToVar(foodList[i]["calcium"],i);
+              systems[19]+= parseValToVar(-foodList[i]["calcium"],i);
+              systems[20]+=  parseValToVar(foodList[i]["iron"],i);
+              systems[21]+= parseValToVar(-foodList[i]["iron"],i);
         
               //quantity constraints
               for(var j=22;j<rows-1;j++){
@@ -401,13 +401,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               food.cost = Math.round(this.selectedFood[i].cost * 100 * dietServing[i])/100;
               dietFoodList.push(food);
             }
-            console.log(`servings`);
+            console.log("servings");
             console.log(dietFoodList);
             var infeasible = this.root.querySelector('#infeasible');
             infeasible.setAttribute('style','display: none; visibility: hidden;');
             var table = this.root.querySelector('#feasible');
             table.setAttribute('style','display: inline; visibility: visible;');
-            var tableInnerHTML = `<tr><th>Food</th><th>Serving</th><th>Serving Size</th><th>Food Cost</th></tr>`;
+            var tableInnerHTML = "<tr><th>Food</th><th>Serving</th><th>Serving Size</th><th>Food Cost</th></tr>";
             
             for(i=0; i<dietFoodList.length; i++) {
               tableInnerHTML += "<tr>";

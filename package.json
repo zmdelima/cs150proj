@@ -1,0 +1,23 @@
+{
+  "name": "workspace",
+  "version": "1.0.0",
+  "description": "[![Build Status](https://travis-ci.org/PolymerElements/polymer-starter-kit.svg?branch=master)](https://travis-ci.org/PolymerElements/polymer-starter-kit)",
+  "main": "service-worker.js",
+  "dependencies": {
+    "bower": "^1.7.9"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zmdelima/cs150proj.git"
+  },
+  "author": "Zydrick Delima",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/zmdelima/cs150proj/issues"
+  },
+  "homepage": "https://github.com/zmdelima/cs150proj#readme"
+}
