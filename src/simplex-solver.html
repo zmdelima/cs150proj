@@ -72,13 +72,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <h4>Objective Function</h4>
         <input id="objective"> = Z</input>
       <br/>
-      <h4>Constraints:</h4> <paper-button id="addC" on-click="addConstraint" raised>ADD Constraint</paper-button>
+      <h4>Constraints:</h4> <paper-button id="addC" on-click="addConstraint" raised>ADD Constraint</paper-button><paper-button class="remove" on-click="removeConstraint">REMOVE LAST CONSTRAINT</paper-button>
       <div id="functions_container">
         <template id="fxn" is="dom-repeat" items="{{constraints}}" >
-            <input value="{{item}}" class="constraint"></input><paper-button class="ineq" on-click="toggleIneq" value="0"><=</paper-button><paper-button class="remove" on-click="removeConstraint">REMOVE</paper-button>
+            <input value$="{{item}}" class="constraint"></input><paper-button class="ineq" on-click="toggleIneq" value="0"><=</paper-button>
         </template>
       </div>
       <paper-button on-click="solve">SOLVE</paper-button>
+      
+      <div id="iterations">
+        
+      </div>
     </div>
   </template>
   <script src="//code.jquery.com/jquery-1.10.2.min.js"></script>
@@ -140,11 +144,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       },
       removeConstraint : function(e){
         console.log('removing Constraint');
-        console.log(this.constraints);
-        console.log(e.target.parentNode.childNodes);
-        var index = this.getChildIndex(e.target);
-        console.log(index);
-        this.constraints.splice((Math.floor((index+1)/2)-1),1);
+        this.constraints.splice(0,1);
         this.root.querySelector('#fxn').render();
       },
       negateFunc : function(equation){
@@ -238,7 +238,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         console.log('sys');
         console.log(sys);
         var mode = (this.root.querySelector('#mode').innerHTML == "MAXIMIZATION") ? 0 : 1;
-        var simplexscr = "  AugCoeffMatrix <- function(system) {     equation <- NULL;     pos <- NULL;     ing <- NULL;     variables <- NULL;     for (i in seq(1, length(system), by=1)) {              current <- unlist(system[i]);       current <- deparse(current);              for (x in seq(2, length(current), by=1)) {         equation <- paste(equation, current[x], sep=\"\");       };       current = equation;       equation = NULL;              substr(current, nchar(current), nchar(current)) = \" \";              current <- strsplit(current, \"\\\\s+\");       current <- unlist(current);                     for (y in seq(1, length(current), by=1)) {         if (is.na(as.numeric(current[y]))) {           current[y] <- \"\";         } else {           break;         };       };       variableIndex = grep(\"x\", current);                     if (i > 1) {         if (csize != length(variableIndex)+1) {         };       };              csize <- length(variableIndex)+1;              for (x in seq(1, length(variableIndex), by=1)) {         pos[length(pos)+1] = as.numeric(substr(current[variableIndex[x]], 2, 3));       };              for (x in seq(1, length(variableIndex), by=1)) {         ing[length(ing)+1] = as.numeric(current[variableIndex[pos[x]]-2]);       };       for (x in seq(2, length(current), by=1)) {         if (substr(current[x], 1, 1) != \"x\") {           if (x == length(current)) {             ing[length(ing)+1] = current[x];           } else if (grepl(\"\\\\+\", current[x+1])) {              ing[length(ing)+1] = current[x];           };         };       };                     pos = c();     };          ing <- as.numeric(ing);          for (i in seq(csize, length(ing), by=csize)) {       ing[i] = ing[i] * -1;     };          mat = matrix(c(ing), nrow=length(system), ncol=csize, byrow=TRUE);          for (i in seq(1, csize-1, by=1)) {       variables[length(variables)+1] = paste(\"x\", i, sep=\"\");     };               rownames(mat) <- 1:length(system);     colnames(mat) <- c(variables, \"RHS\");          return(list(variables=variables, augcoeffmatrix=mat));        };      Simplex <- function(x,mode) {     mat <- AugCoeffMatrix(x)$augcoeffmatrix;     matrix <- mat;     iter <- 0;     compilation <- NULL;     x <- NULL;     if(mode == 1){       matrix <- t(mat);     };          matrix[nrow(matrix),] = matrix[nrow(matrix),] * -1;     matrix = cbind(matrix[ , 1:ncol(matrix)-1], diag(nrow(matrix)), matrix[ , ncol(matrix)]);     compilation[[1]] = matrix;     for(iter in seq(1, 10000,by=1)){       minCol <- which.min(matrix[nrow(matrix),]);       if(matrix[nrow(matrix),minCol] >= 0) {         return (compilation);       };       pCol <- matrix[,minCol];       rhsCol <- matrix[,ncol(matrix)];       rowVal <- rhsCol / pCol;       rowVal <- rowVal[1:length(rowVal)-1];              minRow <- which(rowVal == min(rowVal[which(rowVal > 0)]));       matrix[minRow,] = matrix[minRow,] / matrix[minRow,minCol];       for(i in seq(1,nrow(matrix),by=1)){         if(length(minRow) == 0) return (list());         if(i == minRow) next;         if(length(matrix[i,]) != length(matrix[i,] - (matrix[i,minCol]*matrix[minRow,]))) return (list());         matrix[i,] = matrix[i,] - (matrix[i,minCol]*matrix[minRow,]);       };       compilation[[iter+1]] = matrix;     };   };";
+        var simplexscr = "  AugCoeffMatrix <- function(system) {     equation <- NULL;     pos <- NULL;     ing <- NULL;     variables <- NULL;     for (i in seq(1, length(system), by=1)) {              current <- unlist(system[i]);       current <- deparse(current);              for (x in seq(2, length(current), by=1)) {         equation <- paste(equation, current[x], sep=\"\");       };       current = equation;       equation = NULL;              substr(current, nchar(current), nchar(current)) = \" \";              current <- strsplit(current, \"\\\\s+\");       current <- unlist(current);                     for (y in seq(1, length(current), by=1)) {         if (is.na(as.numeric(current[y]))) {           current[y] <- \"\";         } else {           break;         };       };       variableIndex = grep(\"x\", current);                     if (i > 1) {         if (csize != length(variableIndex)+1) {         };       };              csize <- length(variableIndex)+1;              for (x in seq(1, length(variableIndex), by=1)) {         pos[length(pos)+1] = as.numeric(substr(current[variableIndex[x]], 2, 3));       };              for (x in seq(1, length(variableIndex), by=1)) {         ing[length(ing)+1] = as.numeric(current[variableIndex[pos[x]]-2]);       };       for (x in seq(2, length(current), by=1)) {         if (substr(current[x], 1, 1) != \"x\") {           if (x == length(current)) {             ing[length(ing)+1] = current[x];           } else if (grepl(\"\\\\+\", current[x+1])) {              ing[length(ing)+1] = current[x];           };         };       };                     pos = c();     };          ing <- as.numeric(ing);          for (i in seq(csize, length(ing), by=csize)) {       ing[i] = ing[i] * -1;     };          mat = matrix(c(ing), nrow=length(system), ncol=csize, byrow=TRUE);          for (i in seq(1, csize-1, by=1)) {       variables[length(variables)+1] = paste(\"x\", i, sep=\"\");     };               rownames(mat) <- 1:length(system);     colnames(mat) <- c(variables, \"RHS\");          return(list(variables=variables, augcoeffmatrix=mat));        };      Simplex <- function(x,mode) {     mat <- AugCoeffMatrix(x)$augcoeffmatrix;     matrix <- mat;     iter <- 0;     compilation <- NULL;     x <- NULL;     if(mode == 1){       matrix <- t(mat);     };          matrix[nrow(matrix),] = matrix[nrow(matrix),] * -1;     matrix = cbind(matrix[ , 1:ncol(matrix)-1], diag(nrow(matrix)), matrix[ , ncol(matrix)]);     compilation[[1]] = matrix;     for(iter in seq(1, 10000,by=1)){       minCol <- which.min(matrix[nrow(matrix),]);       if(matrix[nrow(matrix),minCol] >= 0) {         return (compilation);       };       pCol <- matrix[,minCol];       rhsCol <- matrix[,ncol(matrix)];       rowVal <- rhsCol / pCol;       rowVal <- rowVal[1:length(rowVal)-1];              minRow <- which(rowVal == min(rowVal[which(rowVal > 0)]));       matrix[minRow,] = matrix[minRow,] / matrix[minRow,minCol];       if(is.infinite(matrix[minRow,minCol]) || is.nan(matrix[minRow,minCol])){         return (list());       };       for(i in seq(1,nrow(matrix),by=1)){         if(length(minRow) == 0) return (list());         if(i == minRow) next;         if(length(matrix[i,]) != length(matrix[i,] - (matrix[i,minCol]*matrix[minRow,]))) return (list());         matrix[i,] = matrix[i,] - (matrix[i,minCol]*matrix[minRow,]);       };       compilation[[iter+1]] = matrix;     };   };";
         simplexscr += joinls+";"+sys+"; Simplex(sys,"+mode+");";
         console.log(simplexscr)
         var newSnippet = new ocpu.Snippet(simplexscr);
@@ -248,11 +248,108 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }, function(session){
           console.log("RScript output");
           console.log(session);
+          var cols = (this.constraints.length + var_count) + 2;
           if(session.length != 0) {
-            
+            this.root.querySelector('#iterations').innerHTML = "";
+            for(var i=0; i<session.length; i++){
+              //current tableu table 
+              var tableHeader = document.createElement("h4");
+              tableHeader.innerHTML = "Iteration "+i.toString();
+              var table = document.createElement("table");
+              table.setAttribute('id','tableu'+i.toString());
+              //basic solution table
+              var solHeader = document.createElement("h3");
+              solHeader.innerHTML = "Basic solution";
+              var solTable = document.createElement("table");
+              solTable.setAttribute('id','sol'+i.toString());
+              
+              var header = "<thead><tr>";
+              
+              for(var j=0; j<cols; j++){
+                header += "<th>";
+                if (j < var_count) {
+                  header += "x"+(j+1).toString();
+                } else if (j == cols-2) {
+                  header += "Z"; 
+                } else if (j == cols-1) {
+                  header += "RHS"; 
+                } else {
+                  header += "s"+(j-var_count+1).toString();
+                }
+                header += "</th>";
+              }
+              header += "</tr></thead>";
+              
+              //tableu values
+              var cell = "<tbody>";
+              for(j=0; j<this.constraints.length+1; j++){
+                cell += "<tr>";
+                for(var k=0; k<cols; k++){
+                   cell += "<td>"+session[i][j][k].toString()+"</td>";
+                }
+                cell += "</tr>";
+              }
+              cell +="</tbody>"
+              var getBasicSol = function(tableu) {
+                var ret = [];
+                console.log(`tableu`);
+                console.log(tableu);
+                console.log(`length`);
+                console.log(tableu[0]);
+                var rhs = tableu[0].length-1;
+                for(var k=0; k<rhs; k++){
+                  var temp_col = [];
+                  for(var l=0 ;l<tableu.length;l++){
+                    temp_col.push(tableu[l][k]);
+                  }
+                  var zero_count  = temp_col.reduce(function(n, val) {
+                      return n + (val == 0);
+                    }, 0);
+                  var one_count  = temp_col.reduce(function(n, val) {
+                      return n + (val == 1);
+                  }, 0);
+                  console.log('one_count:'+one_count)
+                  console.log('zero_count:'+zero_count);
+                  if(one_count + zero_count == this.constraints.length+1) {
+                    console.log('pushing value');
+                    console.log(tableu[temp_col.indexOf(1)][rhs]);
+                    ret.push(tableu[temp_col.indexOf(1)][rhs]);
+                  } else {
+                    console.log('pushing 0');
+                    ret.push(0);
+                  }
+                  console.log('temp col '+k.toString());
+                  console.log(temp_col);
+                }
+                console.log('returning array');
+                console.log(ret)
+                return (ret);
+              }.bind(this);
+              
+              //basic solution values
+              var solCell = "<tbody>";
+              var solArray = getBasicSol(session[i]);
+              solCell += "<tr>";
+              for(var m=0; m<cols; m++){
+                 solCell += "<td>"+solArray[m]+"</td>";
+              }
+              solCell += "</tr>";
+              solCell +="</tbody>";
+              
+              console.log(header);
+              console.log(cell);
+              table.innerHTML = header + cell;
+              solTable.innerHTML = header + solCell;
+              
+              this.root.querySelector('#iterations').appendChild(tableHeader);
+              this.root.querySelector('#iterations').appendChild(table);
+              this.root.querySelector('#iterations').appendChild(solHeader);
+              this.root.querySelector('#iterations').appendChild(solTable);
+            }
           }
           else {
-            window.alert("Infeasible objective function and constraints combination")
+            this.root.querySelector('#iterations').innerHTML = "<h3>INFEASIBLE Objective and Constraint Functions</h3>";
+            window.alert("Infeasible objective function and constraints combination");
           }
         }.bind(this));
       }
