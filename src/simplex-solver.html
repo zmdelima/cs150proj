@@ -10,6 +10,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/paper-toast/paper-toast.html">
 
 <link rel="import" href="shared-styles.html">
 
@@ -88,6 +89,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         
       </div>
     </div>
+  <paper-toast id="toast"></paper-toast>
   </template>
   <script src="//code.jquery.com/jquery-1.10.2.min.js"></script>
   <script src="../bower_components/opencpu.js/opencpu-0.5.js"></script>
@@ -170,13 +172,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       solve : function(){
         var conts = this.root.querySelectorAll(".constraint");
         if(conts.length == 0) {
-          window.alert("There are no Constraints!");
+          this.$.toast.innerHTML = "There are no Constraints!";
+          this.$.toast.show();
           return;
         }
         this.constraints = [];
         for (var i=0; i<conts.length; i++) {
           if(conts[i].value == "") {
-            window.alert("Please put input in constraint "+(i+1)+" or delete the constraint if it is really empty");
+          this.$.toast.innerHTML = "Please put input in constraint "+(i+1)+" or delete the constraint if it is really empty";
+          this.$.toast.show();
             return;
           }
           this.constraints[i] = conts[i].value;
@@ -187,7 +191,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         for (var i=0; i<conts.length; i++) {
           var_count = this.countVar(conts[i].value);
           if(prev_count != var_count) {
-            window.alert("Incorrect number of variables in constraint "+(i+1));
+          this.$.toast.innerHTML = "Incorrect number of variables in constraint "+(i+1);
+          this.$.toast.show();
             return;
           }
           prev_count = var_count;
@@ -350,8 +355,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           }
           else {
             this.root.querySelector('#iterations').innerHTML = "<h3>INFEASIBLE Objective and Constraint Functions</h3>";
-            window.alert("Infeasible objective function and constraints combination");
+            this.$.toast.innerHTML = "Infeasible objective function and constraints combination";
+            this.$.toast.show();
           }
+        }.bind(this)).fail(function(){
+            this.root.querySelector('#iterations').innerHTML = "<h3>INFEASIBLE Objective and Constraint Functions</h3>";
+            this.$.toast.innerHTML = "Infeasible objective function and constraints combination";
+            this.$.toast.show();
         }.bind(this));
       }
     });

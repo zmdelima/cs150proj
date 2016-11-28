@@ -15,6 +15,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <!--<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">-->
 <link rel="import" href="my-icons.html">
 <link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/paper-toast/paper-toast.html">
 
 <!-- Other Dependencies -->
 <link rel="import" href="shared-styles.html">
@@ -158,7 +159,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           
         </div>
     </div>
-  
+  <paper-toast id="toast"></paper-toast>
   </template>
   <script src="//code.jquery.com/jquery-1.10.2.min.js"></script>
   <script src="../bower_components/opencpu.js/opencpu-0.5.js"></script>
@@ -178,6 +179,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         e.target.setAttribute('icon','remove')
         e.target.setAttribute('on-click','removeItem')
         e.target.parentNode.setAttribute('class','pfl')
+        this.$.toast.innerHTML = "You have added an item in the selected foods";
+        this.$.toast.show();
       },
       removeItem: function(e){
         //stop click propagation to parent element
@@ -196,6 +199,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         e.target.setAttribute('icon','add')
         e.target.setAttribute('on-click','addItem')
         e.target.parentNode.setAttribute('class','fl')
+        
+        this.$.toast.innerHTML = "You have removed an item in the selected foods";
+        this.$.toast.show();
       },
       clearChoices: function(){
         //push every remove button that is under the picked food list class
@@ -203,6 +209,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         pickedfoods.forEach(function(pickedfood){
           pickedfood.click();
         });
+        this.$.toast.innerHTML = "You have cleared food choices";
+        this.$.toast.show();
       },
       chooseAllChoices: function(){
         //push every remove button that is under the picked food list class
@@ -210,6 +218,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         pickedfoods.forEach(function(pickedfood){
           pickedfood.click();
         });
+        this.$.toast.innerHTML = "You have selected every food";
+        this.$.toast.show();
       },
       displayThis: function(e){
         this.set("displayFood",e.target.value)
@@ -244,6 +254,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       solve: function() {
         var pickedFoodList =  this.selectedFood;
         
+        if(this.selectedFood.length == 0){
+          this.$.toast.innerHTML = "You have NOT selected any food! Cannot solve without food choices.";
+          this.$.toast.show();
+          return;
+        }
         //parsing a value to its corresponding linear value to variable 
         var parseValToVar = function (val, index) {
           var str = "";
@@ -376,7 +391,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             "x" : newSnippet
         }, function(session){
           
-          
           if(session.length != 0) {
             //creation of diet Foods tableu
             var dietSolution = session[session.length-1][session[session.length-1].length-1];
@@ -424,8 +438,24 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             }
             s += "</br> <h3>ARE INFEASIBLE</h3>";
             display.innerHTML = s;
+            this.$.toast.innerHTML = "Infeasible Selected Foods";
+            this.$.toast.show();
           }
-        }.bind(this));
+        }.bind(this)).fail(function(){
+            var table = this.root.querySelector('#feasible');
+            table.setAttribute('style','display: none; visibility: hidden;');
+            var display = this.root.querySelector('#infeasible');
+            display.setAttribute('style','display: inline; visibility: visible;');
+            var s = "Your selected Foods: <br/>";
+            for(i=0;i<this.selectedFood.length; i++) {
+              s += " "+this.selectedFood[i].name+"&nbsp;&nbsp;&nbsp;";
+              if(s % 3 == 0) s+= "<br/>";
+            }
+            s += "</br> <h3>ARE INFEASIBLE</h3>";
+            display.innerHTML = s;
+            this.$.toast.innerHTML = "Infeasible Selected Foods";
+            this.$.toast.show();
+        }.bind(this))
       },
       properties: {
         displayFood: {
