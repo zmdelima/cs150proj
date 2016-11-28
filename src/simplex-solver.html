@@ -47,6 +47,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         color: black;
         width: 5%;
       }
+      #solvebtn {
+        background-color: var(--paper-yellow-800);
+        color: white;
+      }
     </style>
 
     <div class="card">
@@ -83,7 +87,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <input value$="{{item}}" class="constraint"></input><paper-button class="ineq" on-click="toggleIneq" value="0"><=</paper-button>
         </template>
       </div>
-      <paper-button on-click="solve">SOLVE</paper-button>
+      <paper-button id="solvebtn" on-click="solve">SOLVE</paper-button>
       
       <div id="iterations">
         
